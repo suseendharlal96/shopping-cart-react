@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MongoDb file upload</title>
+  </head>
+  <body>
+    <h1>File upload</h1>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+      <div class="custom-file mb-3">
+        <input type="file" name="myfile" id="file" class="custom-file-input" />
+        <label for="file" class="custom-file-label">
+          Choose file
+        </label>
+      </div>
+      <input type="submit" value="Submit" class="btn btn-primary btn-block" />
+    </form>
+    <hr />
+    <% if(files){%> <%files.forEach(file=>{ %>
+    <div class="card card-body">
+      <%if(file.isImage){ %>
+      <img src="image/<%=file.filename %>" alt="image" />
+      <% }else{ %> <%= file.filename%> <% }%>
+    </div>
+    <%})%> <%}else{%>
+    <p>No files found</p>
+    <%}%>
+  </body>
+</html>
