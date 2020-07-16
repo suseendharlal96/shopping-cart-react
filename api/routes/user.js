@@ -2,7 +2,15 @@ const express = require("express");
 const router = express.Router();
 
 const userController = require("../controllers/user");
+const checkAuth = require("../middleware/auth");
 
-router.post("/user/signup", userController.signup);
+// signup
+router.post("/signup", userController.signup);
 
-router.post("/user/signin", userController.signin);
+// signin
+router.post("/signin", userController.signin);
+
+// add products to user cart
+router.post("/cart", checkAuth, userController.cart);
+
+module.exports = router;

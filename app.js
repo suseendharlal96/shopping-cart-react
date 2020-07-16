@@ -12,6 +12,7 @@ const mongoose = require("mongoose");
 
 const productRoute = require("./api/routes/products");
 const orderRoute = require("./api/routes/orders");
+const userRoute = require("./api/routes/user");
 
 // app.use("./uploads", express.static("uploads"));
 app.use(morgan("dev"));
@@ -19,9 +20,16 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 // app.use(methodOverride("_method"));
 
-mongoose.connect(
-  "mongodb+srv://suseendhar:susee123@cluster0-iwva7.mongodb.net/shoppingcart?retryWrites=true&w=majority"
-);
+mongoose
+  .connect(
+    "mongodb+srv://suseendhar:susee123@cluster0-iwva7.mongodb.net/shoppingcart?retryWrites=true&w=majority"
+  )
+  .then((res) => {
+    console.log("connected");
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 
 // let gfs;
 // connection.once("open", () => {
@@ -121,6 +129,7 @@ app.use((req, res, next) => {
 // });
 app.use("/products", productRoute);
 app.use("/orders", orderRoute);
+app.use("/user", userRoute);
 
 app.use((req, res, next) => {
   const error = new Error("Route not found");

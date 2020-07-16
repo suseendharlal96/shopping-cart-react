@@ -17,6 +17,10 @@ const productSchema = new Schema({
     type: String,
     required: true,
   },
+  creator: {
+    type: String,
+    required: true,
+  },
 });
 
 module.exports = model("Product", productSchema);

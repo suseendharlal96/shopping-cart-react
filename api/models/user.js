@@ -10,6 +10,7 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
+  cart: [],
 });
 
 module.exports = model("User", userSchema);

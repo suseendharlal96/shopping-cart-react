@@ -31,12 +31,16 @@ exports.getSingleProduct = async (req, res, next) => {
 };
 
 exports.createProduct = async (req, res, next) => {
-  console.log(req.file);
+  if (!req.userId) {
+    return res.status(400).json({ error: "Unauthorized" });
+  }
+  // console.log(req.file);
   const prod = new Product({
     name: req.body.name,
     price: req.body.price,
     image: req.body.imageurl,
     description: req.body.description,
+    creator: req.userId,
   });
 
   try {
@@ -53,11 +57,21 @@ exports.createProduct = async (req, res, next) => {
 };
 
 exports.updateProduct = async (req, res, next) => {
+  if (!req.userId) {
+    return res.status(400).json({ error: "Unauthorized" });
+  }
   try {
     const updateId = req.params.updateId;
     const updated = await Product.update(
       { _id: updateId },
-      { $set: { name: req.body.name, price: req.body.price } }
+      {
+        $set: {
+          name: req.body.name,
+          price: req.body.price,
+          image: req.body.imageurl,
+          description: req.body.description,
+        },
+      }
     );
     console.log(updated);
     if (updated) {
@@ -72,6 +86,9 @@ exports.updateProduct = async (req, res, next) => {
 };
 
 exports.deleteProduct = async (req, res, next) => {
+  if (!req.userId) {
+    return res.status(400).json({ error: "Unauthorized" });
+  }
   const delId = req.params.delId;
   try {
     const deleted = await Product.deleteOne({ _id: delId });

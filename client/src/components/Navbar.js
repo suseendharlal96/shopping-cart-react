@@ -1,13 +1,29 @@
-import React from "react";
+import React, { useContext } from "react";
 import { NavLink } from "react-router-dom";
 
 import { Menu } from "semantic-ui-react";
 
+import { AuthContext } from "../context/authcontext";
+
 const Navbar = () => {
-  return (
+  const { email, setToken, token } = useContext(AuthContext);
+  return token ? (
     <Menu inverted size="large" color="blue">
       <Menu.Item name="Home" as={NavLink} to="/" />
-      <Menu.Item name="Orders" as={NavLink} to="/orders"/>
+      <Menu.Item name="cart" as={NavLink} to="/cart" />
+      <Menu.Menu position="right">
+        <Menu.Item name={"Logged as " + email.split("@")[0]} />
+        <Menu.Item
+          name="logout"
+          onClick={() => setToken(null)}
+          as={NavLink}
+          to="/auth"
+        />
+      </Menu.Menu>
+    </Menu>
+  ) : (
+    <Menu inverted size="large" color="blue">
+      <Menu.Item name="Home" as={NavLink} to="/" />
       <Menu.Menu position="right">
         <Menu.Item name="Authenticate" as={NavLink} to="/auth" />
       </Menu.Menu>
