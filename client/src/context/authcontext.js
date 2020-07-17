@@ -6,7 +6,7 @@ const AuthProvider = (props) => {
   const [token, setToken] = useState(null);
   const [userId, setUserId] = useState(null);
   const [email, setEmail] = useState(null);
-  const [cart, setCart] = useState([]);
+  const [cartTotal, setCartTotal] = useState(null);
   const [updateProduct, setUpdateProduct] = useState(null);
 
   return (
@@ -18,10 +18,10 @@ const AuthProvider = (props) => {
         setUserId,
         email,
         setEmail,
+        cartTotal,
+        setCartTotal,
         updateProduct,
         setUpdateProduct,
-        cart,
-        setCart,
       }}
     >
       {props.children}

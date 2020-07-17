@@ -6,7 +6,7 @@ import axios from "axios";
 import { AuthContext } from "../context/authcontext";
 
 const Auth = (props) => {
-  const { setToken, setEmail, setUserId, setCart } = useContext(AuthContext);
+  const { setToken, setEmail, setUserId } = useContext(AuthContext);
   const [formValue, setFormValue] = useState({
     email: "",
     password: "",
@@ -44,7 +44,7 @@ const Auth = (props) => {
         setLoading(false);
         if (res.data && res.data.result) {
           console.log(res.data);
-          setCart(res.data.result.cart);
+          // setCart(res.data.result.cart);
           setEmail(res.data.result.email);
           setUserId(res.data.result._id);
           setToken(res.data.token);

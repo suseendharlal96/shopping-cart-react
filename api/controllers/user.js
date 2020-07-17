@@ -1,3 +1,4 @@
+const paypal = require("paypal-rest-sdk");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
@@ -90,12 +91,30 @@ exports.signin = async (req, res, next) => {
   }
 };
 
-exports.cart = async (req, res, next) => {
-  console.log(req.body);
-  const product = req.body;
+exports.getCart = async (req, res, next) => {
   if (!req.userId) {
     return res.status(400).json({ error: "Unauthorized" });
   }
+  const userId = req.params.userId;
+  const user = await User.findById(userId);
+  if (user) {
+    return res.status(200).json({
+      msg: "Cart retrieved",
+      cart: user.cart,
+    });
+  } else {
+    return res.status(404).json({
+      error: "User not found",
+    });
+  }
+};
+
+exports.postCart = async (req, res, next) => {
+  if (!req.userId) {
+    return res.status(400).json({ error: "Unauthorized" });
+  }
+  console.log(req.body);
+  const product = req.body;
   const user = await User.findById(req.userId);
   if (user) {
     if (user.cart && user.cart.length) {
@@ -124,4 +143,69 @@ exports.cart = async (req, res, next) => {
       });
     }
   }
+};
+
+exports.removeCartItem = async (req, res, next) => {
+  if (!req.userId) {
+    return res.status(400).json({ error: "Unauthorized" });
+  }
+  const prodId = req.body.productId;
+  const user = await User.findById(req.userId);
+  if (user) {
+    if (user.cart && user.cart.length) {
+      const cIndex = user.cart.findIndex((c) => c._id === prodId);
+      if (cIndex !== -1) {
+        user.cart.splice(cIndex, 1);
+      }
+      const result = await user.save();
+      console.log("res", result);
+      if (result) {
+        return res.status(200).json({
+          msg: "CartItem removed",
+        });
+      }
+    }
+  }
+};
+
+exports.pay = (req, res, next) => {
+  const create_payment_json = {
+    intent: "sale",
+    payer: {
+      payment_method: "paypal",
+    },
+    redirect_urls: {
+      return_url: "http://localhost:5000",
+      cancel_url: "http://localhost:5000/cart",
+    },
+    transactions: [
+      {
+        item_list: {
+          items: [
+            {
+              name: "asd",
+              price: "sdf",
+              currency: "USD",
+              quantity: "asd",
+            },
+          ],
+        },
+        amount: {
+          currency: "USD",
+          total: "sdf",
+        },
+        description: "This is the payment description.",
+      },
+    ],
+  };
+
+  paypal.payment.create(create_payment_json, (error, payment) => {
+    if (error) {
+      throw error;
+    } else {
+      console.log("Create Payment Response");
+      console.log(payment);
+      res.send("test");
+    }
+  });
 };

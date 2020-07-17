@@ -1,4 +1,5 @@
 const Product = require("../models/product");
+const User = require("../models/user");
 
 exports.getAllProducts = async (req, res, next) => {
   try {
@@ -62,6 +63,7 @@ exports.updateProduct = async (req, res, next) => {
   }
   try {
     const updateId = req.params.updateId;
+    const userId = req.userId;
     const updated = await Product.update(
       { _id: updateId },
       {
@@ -73,8 +75,31 @@ exports.updateProduct = async (req, res, next) => {
         },
       }
     );
+
     console.log(updated);
     if (updated) {
+      const user = await User.findById(userId);
+      if (user) {
+        if (user.cart && user.cart.length) {
+          const cartIndex = user.cart.findIndex((c) => c._id === updateId);
+          if (cartIndex >= 0) {
+            console.log(1);
+            user.cart[cartIndex].name = req.body.name;
+            user.cart[cartIndex].price = req.body.price;
+            user.cart[cartIndex].image = req.body.imageurl;
+            user.cart[cartIndex].description = req.body.description;
+            console.log(user.cart);
+            const result = await User.update(
+              { _id: req.userId },
+              {
+                $set: {
+                  cart: user.cart,
+                },
+              }
+            );
+          }
+        }
+      }
       res.status(200).json({
         msg: "Products",
         product: updated,
