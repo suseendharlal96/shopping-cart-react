@@ -11,6 +11,7 @@ const userSchema = new Schema({
     required: true,
   },
   cart: [],
+  order: [],
 });
 
 module.exports = model("User", userSchema);

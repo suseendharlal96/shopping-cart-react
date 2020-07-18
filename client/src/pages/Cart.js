@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { Route } from "react-router-dom";
 
 import axios from "axios";
+import StripeCheckout from "react-stripe-checkout";
 import { Card, Button, Image, Input } from "semantic-ui-react";
 
 import { AuthContext } from "../context/authcontext";
@@ -13,7 +14,7 @@ const Cart = (props) => {
   const [actualmyCart, setactualMyCart] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const { token, userId, setCartTotal } = useContext(AuthContext);
+  const { token, userId, setCartTotal, email } = useContext(AuthContext);
 
   useEffect(() => {
     if (!token) {
@@ -118,6 +119,17 @@ const Cart = (props) => {
       .catch((err) => console.log(err));
   };
 
+  const makepayment = (token, product) => {
+    console.log(token);
+    console.log(product);
+    axios
+      .post("/user/pay", { product: product, token: token })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => console.log(err));
+  };
+
   return (
     <div>
       <h2 style={{ textAlign: "center" }}>Total Price:{cartTotal}</h2>
@@ -150,9 +162,21 @@ const Cart = (props) => {
                 )}
               </Card.Content>
               <Card.Content extra>
-                <Button onClick={checkout} inverted color="green">
-                  Checkout
-                </Button>
+                <StripeCheckout
+                  token={(t) => makepayment(t, c)}
+                  name={"Product Name: " + c.name}
+                  image={c.image}
+                  email={email}
+                  panelLabel={"Proceed to pay"}
+                  description="STRIPE-Safe and Secure Payments"
+                  stripeKey="pk_test_51H54IgEH45zGy2FRW5V9EQMtqCHFnUbuxogqUbG8ENCn5GBUT6qxDeFTvfomsusc2J6aUSpzmB3UJLnLOMh2aq4t00c2Cwlhz3"
+                  amount={c.qty * c.price * 100}
+                  currency="INR"
+                >
+                  <Button inverted color="green">
+                    Checkout
+                  </Button>
+                </StripeCheckout>
                 <Button
                   inverted
                   color="red"

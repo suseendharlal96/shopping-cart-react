@@ -4,6 +4,7 @@ const morgan = require("morgan");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const paypal = require("paypal-rest-sdk");
+
 // const crypto = require("crypto");
 // const multer = require("multer");
 // const GridFsStorage = require("multer-gridfs-storage");
@@ -138,48 +139,7 @@ app.use((req, res, next) => {
 app.use("/products", productRoute);
 app.use("/orders", orderRoute);
 app.use("/user", userRoute);
-app.post("/pay", (req, res, next) => {
-  const create_payment_json = {
-    intent: "sale",
-    payer: {
-      payment_method: "paypal",
-    },
-    redirect_urls: {
-      return_url: "http://localhost:5000",
-      cancel_url: "http://localhost:5000/cart",
-    },
-    transactions: [
-      {
-        item_list: {
-          items: [
-            {
-              name: "asd",
-              price: "sdf",
-              currency: "USD",
-              quantity: "asd",
-            },
-          ],
-        },
-        amount: {
-          currency: "USD",
-          total: "sdf",
-        },
-        description: "This is the payment description.",
-      },
-    ],
-  };
 
-  paypal.payment.create(create_payment_json, (error, payment) => {
-    if (error) {
-      console.log(error);
-      res.send(error)
-    } else {
-      console.log("Create Payment Response");
-      console.log(payment);
-      res.send("test");
-    }
-  });
-});
 app.use((req, res, next) => {
   const error = new Error("Route not found");
   error.status = 404;

@@ -1,4 +1,7 @@
-const paypal = require("paypal-rest-sdk");
+const stripe = require("stripe")(
+  "sk_test_51H54IgEH45zGy2FR0o4CN8r6LOrf9j5XoambtOCSjuxwMoKtv7LAQEqWnTFM5ZN3ng5W3e8TK7iq1t2lZ2ivubbB00KvM8ofXU"
+);
+const { v4: uuidv4 } = require("uuid");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
@@ -168,44 +171,29 @@ exports.removeCartItem = async (req, res, next) => {
   }
 };
 
-exports.pay = (req, res, next) => {
-  const create_payment_json = {
-    intent: "sale",
-    payer: {
-      payment_method: "paypal",
-    },
-    redirect_urls: {
-      return_url: "http://localhost:5000",
-      cancel_url: "http://localhost:5000/cart",
-    },
-    transactions: [
-      {
-        item_list: {
-          items: [
-            {
-              name: "asd",
-              price: "sdf",
-              currency: "USD",
-              quantity: "asd",
-            },
-          ],
-        },
-        amount: {
-          currency: "USD",
-          total: "sdf",
-        },
-        description: "This is the payment description.",
-      },
-    ],
-  };
-
-  paypal.payment.create(create_payment_json, (error, payment) => {
-    if (error) {
-      throw error;
-    } else {
-      console.log("Create Payment Response");
-      console.log(payment);
-      res.send("test");
-    }
+exports.pay = async (req, res, next) => {
+  const idempotencyKey = uuidv4();
+  const product = req.body.product;
+  const token = req.body.token;
+  console.log(token);
+  console.log(product);
+  console.log(idempotencyKey);
+  const customer = await stripe.customers.create({
+    email: token.email,
+    source: token.id,
   });
+  if (customer) {
+    const result = await stripe.charges.create(
+      {
+        amount: product.price * product.qty * 100,
+        currency: "inr",
+        customer: customer.id,
+        receipt_email: "lssuseendharlal@gmail.com",
+      },
+      { idempotencyKey }
+    );
+    if (result) {
+      return res.status(200).json({ result: result });
+    }
+  }
 };
