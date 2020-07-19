@@ -8,9 +8,10 @@ import { AuthContext } from "../context/authcontext";
 const Navbar = () => {
   const { email, setToken, token } = useContext(AuthContext);
   return token ? (
-    <Menu inverted size="large" color="blue">
+    <Menu inverted>
       <Menu.Item name="Home" as={NavLink} to="/" />
       <Menu.Item name="cart" as={NavLink} to="/cart" />
+      <Menu.Item name="Orders" as={NavLink} to="/orders" />
       <Menu.Menu position="right">
         <Menu.Item name={"Logged as " + email.split("@")[0]} />
         <Menu.Item
@@ -22,7 +23,7 @@ const Navbar = () => {
       </Menu.Menu>
     </Menu>
   ) : (
-    <Menu inverted size="large" color="blue">
+    <Menu inverted>
       <Menu.Item name="Home" as={NavLink} to="/" />
       <Menu.Menu position="right">
         <Menu.Item name="Authenticate" as={NavLink} to="/auth" />

@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Route } from "react-router-dom";
 
 import axios from "axios";
 import StripeCheckout from "react-stripe-checkout";
@@ -51,11 +50,6 @@ const Cart = (props) => {
 
   const setActualCart = (a) => {
     setactualMyCart(a);
-  };
-
-  const checkout = () => {
-    setCartTotal(cartTotal);
-    props.history.push("/checkout");
   };
 
   const calcTotalPrice = (cart) => {
@@ -119,13 +113,22 @@ const Cart = (props) => {
       .catch((err) => console.log(err));
   };
 
-  const makepayment = (token, product) => {
-    console.log(token);
+  const makepayment = (paymentToken, product) => {
+    console.log(paymentToken);
     console.log(product);
     axios
-      .post("/user/pay", { product: product, token: token })
+      .post(
+        "/user/pay",
+        { product: product, token: paymentToken },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
       .then((res) => {
         console.log(res);
+        props.history.push("/success");
       })
       .catch((err) => console.log(err));
   };

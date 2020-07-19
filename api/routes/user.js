@@ -20,6 +20,9 @@ router.post("/cart", checkAuth, userController.postCart);
 router.post("/removeCartItem", checkAuth, userController.removeCartItem);
 
 // pay the amount
-router.post('/pay',userController.pay)
+router.post("/pay", checkAuth, userController.pay);
+
+// get the orders
+router.get("/orders", checkAuth, userController.getOrders);
 
 module.exports = router;
