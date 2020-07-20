@@ -39,14 +39,18 @@ const Home = (props) => {
   };
 
   const submitHandler = (product) => {
-    console.log(product)
+    console.log(product);
     if (updateProduct) {
       axios
-        .patch(`https://node-shop-cart.herokuapp.com/products/${updateProduct._id}`, product, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
+        .patch(
+          `https://node-shop-cart.herokuapp.com/products/${updateProduct._id}`,
+          product,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
         .then((res) => {
           setModal(false);
           setUpdateProduct(null);
@@ -80,6 +84,19 @@ const Home = (props) => {
     setModal(true);
   };
 
+  const deleteProduct = (prodId) => {
+    axios
+      .delete(`https://node-shop-cart.herokuapp.com/products/${prodId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        console.log(res.data);
+      })
+      .catch((err) => console.log(err));
+  };
+
   const addToCart = (product) => {
     axios
       .post("https://node-shop-cart.herokuapp.com/user/cart", product, {
@@ -109,7 +126,12 @@ const Home = (props) => {
             </Button>
             {userId && product.creator === userId && (
               <React.Fragment>
-                <Button floated="right" inverted color="red">
+                <Button
+                  floated="right"
+                  onClick={() => deleteProduct(product._id)}
+                  inverted
+                  color="red"
+                >
                   Delete
                 </Button>
                 <Button
