@@ -39,6 +39,7 @@ const Home = (props) => {
   };
 
   const submitHandler = (product) => {
+    console.log(product)
     if (updateProduct) {
       axios
         .patch(`/products/${updateProduct._id}`, product, {

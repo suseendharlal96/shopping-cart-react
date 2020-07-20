@@ -60,9 +60,6 @@ const Orders = (props) => {
                     Paid on:{dayjs(c.date).format("ddd, MMM D, YYYY h:mm A")}
                   </strong>
                 </Card.Meta>
-                <Card.Description>
-                  About:{c.product.description}
-                </Card.Description>
                 <a
                   style={{ float: "right" }}
                   href={c.receiptUrl}

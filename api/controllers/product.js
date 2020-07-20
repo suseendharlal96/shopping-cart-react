@@ -35,11 +35,12 @@ exports.createProduct = async (req, res, next) => {
   if (!req.userId) {
     return res.status(400).json({ error: "Unauthorized" });
   }
-  // console.log(req.file);
+  console.log(req);
+  console.log(req.file);
   const prod = new Product({
     name: req.body.name,
     price: req.body.price,
-    image: req.body.imageurl,
+    image: req.body.image,
     description: req.body.description,
     creator: req.userId,
   });

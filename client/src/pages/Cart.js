@@ -113,7 +113,7 @@ const Cart = (props) => {
       .catch((err) => console.log(err));
   };
 
-  const makepayment = (paymentToken, product) => {
+  const makepayment = (paymentToken, product, i) => {
     console.log(paymentToken);
     console.log(product);
     axios
@@ -127,8 +127,11 @@ const Cart = (props) => {
         }
       )
       .then((res) => {
+        const a = myCart.splice(i, 1);
+        setMyCart(a);
+        window.open(res.data.result.receipt_url, "_blank");
         console.log(res);
-        props.history.push("/success");
+        // props.history.push("/success");
       })
       .catch((err) => console.log(err));
   };
@@ -166,7 +169,7 @@ const Cart = (props) => {
               </Card.Content>
               <Card.Content extra>
                 <StripeCheckout
-                  token={(t) => makepayment(t, c)}
+                  token={(t) => makepayment(t, c, index)}
                   name={"Product Name: " + c.name}
                   image={c.image}
                   email={email}

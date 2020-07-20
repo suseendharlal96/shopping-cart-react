@@ -6,24 +6,24 @@ const mongoose = require("mongoose");
 const paypal = require("paypal-rest-sdk");
 
 // const crypto = require("crypto");
-// const multer = require("multer");
+const multer = require("multer");
 // const GridFsStorage = require("multer-gridfs-storage");
 // const methodOverride = require("method-override");
 // const gridFsStream = require("gridfs-stream");
 // const path = require("path");
 
-paypal.configure({
-  mode: "sandbox", //sandbox or live
-  client_id:
-    "AYaYjR_BdsBLWqETvY2N875uI5xxsMc56jsoh7EuEnbjE6hQNhtQxfKICh_WlKCgeRvsPF_z1d8qlBIH",
-  client_secret:
-    "EMx25vkROoL_5aXy6_I_aYu8gVZIcEINrLnhFoX8-OqZ8q5scye6_EmFsrUM2FK33riEscSpHFFcLq6J",
-});
+// paypal.configure({
+//   mode: "sandbox", //sandbox or live
+//   client_id:
+//     "AYaYjR_BdsBLWqETvY2N875uI5xxsMc56jsoh7EuEnbjE6hQNhtQxfKICh_WlKCgeRvsPF_z1d8qlBIH",
+//   client_secret:
+//     "EMx25vkROoL_5aXy6_I_aYu8gVZIcEINrLnhFoX8-OqZ8q5scye6_EmFsrUM2FK33riEscSpHFFcLq6J",
+// });
 const productRoute = require("./api/routes/products");
 const orderRoute = require("./api/routes/orders");
 const userRoute = require("./api/routes/user");
 
-// app.use("./uploads", express.static("uploads"));
+app.use("/public", express.static(__dirname + "/public"));
 app.use(morgan("dev"));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
