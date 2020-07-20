@@ -19,7 +19,7 @@ const Orders = (props) => {
 
   const getOrders = () => {
     axios
-      .get("/user/orders", {
+      .get("https://node-shop-cart.herokuapp.com/user/orders", {
         headers: {
           Authorization: `Bearer ${token}`,
         },

@@ -24,7 +24,7 @@ const Home = (props) => {
 
   const getProducts = () => {
     axios
-      .get("/products", {
+      .get("https://node-shop-cart.herokuapp.com/products", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -42,7 +42,7 @@ const Home = (props) => {
     console.log(product)
     if (updateProduct) {
       axios
-        .patch(`/products/${updateProduct._id}`, product, {
+        .patch(`https://node-shop-cart.herokuapp.com/products/${updateProduct._id}`, product, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -58,7 +58,7 @@ const Home = (props) => {
         .catch((err) => console.log(err));
     } else {
       axios
-        .post("/products", product, {
+        .post("https://node-shop-cart.herokuapp.com/products", product, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -82,7 +82,7 @@ const Home = (props) => {
 
   const addToCart = (product) => {
     axios
-      .post("/user/cart", product, {
+      .post("https://node-shop-cart.herokuapp.com/user/cart", product, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

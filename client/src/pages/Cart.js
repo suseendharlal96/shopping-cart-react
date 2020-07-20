@@ -26,7 +26,7 @@ const Cart = (props) => {
   const getCart = () => {
     setLoading(true);
     axios
-      .get(`/user/getCart/${userId}`, {
+      .get(`https://node-shop-cart.herokuapp.com/user/getCart/${userId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -101,7 +101,7 @@ const Cart = (props) => {
     setTotal(totalAmt);
     axios
       .post(
-        "/user/removeCartItem",
+        "https://node-shop-cart.herokuapp.com/user/removeCartItem",
         { productId: id },
         {
           headers: {
@@ -118,7 +118,7 @@ const Cart = (props) => {
     console.log(product);
     axios
       .post(
-        "/user/pay",
+        "https://node-shop-cart.herokuapp.com/user/pay",
         { product: product, token: paymentToken },
         {
           headers: {

@@ -38,7 +38,7 @@ const Auth = (props) => {
       url = "signup";
     }
     axios
-      .post(`/user/${url}`, formValue)
+      .post(`https://node-shop-cart.herokuapp.com/user/${url}`, formValue)
       .then((res) => {
         console.log(res.data);
         setLoading(false);
