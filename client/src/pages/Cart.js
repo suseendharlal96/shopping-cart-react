@@ -127,8 +127,7 @@ const Cart = (props) => {
         }
       )
       .then((res) => {
-        const a = myCart.splice(i, 1);
-        setMyCart(a);
+        getCart();
         window.open(res.data.result.receipt_url, "_blank");
         console.log(res);
         // props.history.push("/success");
