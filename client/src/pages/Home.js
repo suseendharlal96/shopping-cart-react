@@ -92,6 +92,7 @@ const Home = (props) => {
         },
       })
       .then((res) => {
+        getProducts();
         console.log(res.data);
       })
       .catch((err) => console.log(err));
