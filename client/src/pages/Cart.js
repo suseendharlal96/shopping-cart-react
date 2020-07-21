@@ -2,11 +2,14 @@ import React, { useState, useEffect, useContext } from "react";
 
 import axios from "axios";
 import StripeCheckout from "react-stripe-checkout";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { Card, Button, Image, Input } from "semantic-ui-react";
 
 import { AuthContext } from "../context/authcontext";
 
 const Cart = (props) => {
+  toast.configure();
   const [cartTotal, setTotal] = useState(0);
   const [qtyChanged, setQtyChanged] = useState(false);
   const [myCart, setMyCart] = useState(null);
@@ -44,6 +47,9 @@ const Cart = (props) => {
       })
       .catch((err) => {
         console.log(err);
+        toast.error(
+          "There was some trouble fetching your cart.Please try again!"
+        );
         setLoading(false);
       });
   };
@@ -53,11 +59,13 @@ const Cart = (props) => {
   };
 
   const calcTotalPrice = (cart) => {
+    let total = 0;
     if (cart && cart.length) {
-      let total = 0;
       cart.map((c) => {
         total += c.price * c.qty;
       });
+      setTotal(total);
+    } else {
       setTotal(total);
     }
   };
@@ -109,8 +117,14 @@ const Cart = (props) => {
           },
         }
       )
-      .then((res) => console.log(res.data))
-      .catch((err) => console.log(err));
+      .then((res) => {
+        toast.success("Product removed from cart.");
+        console.log(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error("There was some trouble.Please try again!");
+      });
   };
 
   const makepayment = (paymentToken, product, i) => {
@@ -127,12 +141,16 @@ const Cart = (props) => {
         }
       )
       .then((res) => {
+        toast.success("Your payment was successfully received.");
         getCart();
         window.open(res.data.result.receipt_url, "_blank");
         console.log(res);
         // props.history.push("/success");
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        toast.error("There was some trouble with payment.Please try again!");
+        console.log(err);
+      });
   };
 
   return (

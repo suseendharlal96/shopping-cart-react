@@ -133,6 +133,8 @@ exports.deleteProduct = async (req, res, next) => {
           }
         }
       }
+    } else {
+      return res.status(404).json({ error: "Product doesn't exist " });
     }
   } catch (err) {
     console.log(err);

@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useContext } from "react";
 
 import { Card, Button, Image, Grid } from "semantic-ui-react";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
-import MyModal from "../components/MyModal";
 
+import MyModal from "../components/MyModal";
 import { AuthContext } from "../context/authcontext";
 
 const Home = (props) => {
+  toast.configure();
   const { token, userId, setUpdateProduct, updateProduct } = useContext(
     AuthContext
   );
@@ -35,7 +38,10 @@ const Home = (props) => {
           setProducts(res.data.products);
         }
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log(err);
+        toast.error("There was some trouble fetching.Please try again!");
+      });
   };
 
   const submitHandler = (product) => {
@@ -52,6 +58,7 @@ const Home = (props) => {
           }
         )
         .then((res) => {
+          toast.success("Product updated successfully");
           setModal(false);
           setUpdateProduct(null);
           console.log(res.data);
@@ -59,7 +66,10 @@ const Home = (props) => {
             getProducts();
           }
         })
-        .catch((err) => console.log(err));
+        .catch((err) => {
+          console.log(err);
+          toast.error("There was some trouble.Please try again!");
+        });
     } else {
       axios
         .post("https://node-shop-cart.herokuapp.com/products", product, {
@@ -68,13 +78,17 @@ const Home = (props) => {
           },
         })
         .then((res) => {
+          toast.success("Product added successfully");
           setModal(false);
           console.log(res.data);
           if (res.data && res.data.createdProduct) {
             getProducts();
           }
         })
-        .catch((err) => console.log(err));
+        .catch((err) => {
+          console.log(err);
+          toast.error("There was some trouble.Please try again!");
+        });
     }
   };
 
@@ -92,10 +106,14 @@ const Home = (props) => {
         },
       })
       .then((res) => {
+        toast.success("Product deleted successfully");
         getProducts();
         console.log(res.data);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log(err);
+        toast.error("There was some trouble.Please try again!");
+      });
   };
 
   const addToCart = (product) => {
@@ -106,9 +124,13 @@ const Home = (props) => {
         },
       })
       .then((res) => {
+        toast.success("Product added to Cart.");
         console.log(res.data);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log(err);
+        toast.error("There was some trouble.Please try again!");
+      });
   };
 
   const productContent = products ? (

@@ -3,10 +3,13 @@ import React, { useState, useEffect, useContext } from "react";
 import { Card, Image } from "semantic-ui-react";
 import axios from "axios";
 import dayjs from "dayjs";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import { AuthContext } from "../context/authcontext";
 
 const Orders = (props) => {
+  toast.configure();
   const { token } = useContext(AuthContext);
   const [orders, setOrders] = useState(null);
   useEffect(() => {
@@ -27,6 +30,12 @@ const Orders = (props) => {
       .then((res) => {
         console.log(res.data);
         setOrders(res.data.orders.reverse());
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error(
+          "There was some trouble fetching your orders.Please try again!"
+        );
       });
   };
 
