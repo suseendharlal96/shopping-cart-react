@@ -13,10 +13,8 @@ const Cart = (props) => {
   const [cartTotal, setTotal] = useState(0);
   const [qtyChanged, setQtyChanged] = useState(false);
   const [myCart, setMyCart] = useState(null);
-  const [actualmyCart, setactualMyCart] = useState(null);
-  const [loading, setLoading] = useState(false);
 
-  const { token, userId, setCartTotal, email } = useContext(AuthContext);
+  const { token, userId, email } = useContext(AuthContext);
 
   useEffect(() => {
     if (!token) {
@@ -27,7 +25,6 @@ const Cart = (props) => {
   }, []);
 
   const getCart = () => {
-    setLoading(true);
     axios
       .get(`https://node-shop-cart.herokuapp.com/user/getCart/${userId}`, {
         headers: {
@@ -35,14 +32,10 @@ const Cart = (props) => {
         },
       })
       .then((res) => {
-        setLoading(false);
-        console.log(res.data);
         if (res.data.cart) {
           const a = [...res.data.cart];
           setMyCart(res.data.cart);
           calcTotalPrice(res.data.cart);
-          // const a = [...myCart];
-          setActualCart(a);
         }
       })
       .catch((err) => {
@@ -50,12 +43,7 @@ const Cart = (props) => {
         toast.error(
           "There was some trouble fetching your cart.Please try again!"
         );
-        setLoading(false);
       });
-  };
-
-  const setActualCart = (a) => {
-    setactualMyCart(a);
   };
 
   const calcTotalPrice = (cart) => {
@@ -71,32 +59,17 @@ const Cart = (props) => {
   };
 
   const increase = (i) => {
-    console.log(myCart);
-    console.log(actualmyCart);
     const a = [...myCart];
     if (a && a.length) {
       a[i].qty += 1;
-      checkChanges(a, i);
       calcTotalPrice(a);
     }
-  };
-
-  const checkChanges = (cart, i) => {
-    console.log(cart[i].qty);
-    console.log(actualmyCart[i].qty);
-    if (cart[i].qty !== actualmyCart[i].qty) {
-      setQtyChanged(true);
-    } else {
-      setQtyChanged(false);
-    }
-    setMyCart(cart);
   };
 
   const decrease = (i) => {
     const a = [...myCart];
     if (a && a.length) {
       a[i].qty -= 1;
-      checkChanges(a, i);
       calcTotalPrice(a);
     }
   };
@@ -119,7 +92,6 @@ const Cart = (props) => {
       )
       .then((res) => {
         toast.success("Product removed from cart.");
-        console.log(res.data);
       })
       .catch((err) => {
         console.log(err);
@@ -128,8 +100,6 @@ const Cart = (props) => {
   };
 
   const makepayment = (paymentToken, product, i) => {
-    console.log(paymentToken);
-    console.log(product);
     axios
       .post(
         "https://node-shop-cart.herokuapp.com/user/pay",
@@ -144,8 +114,6 @@ const Cart = (props) => {
         toast.success("Your payment was successfully received.");
         getCart();
         window.open(res.data.result.receipt_url, "_blank");
-        console.log(res);
-        // props.history.push("/success");
       })
       .catch((err) => {
         toast.error("There was some trouble with payment.Please try again!");

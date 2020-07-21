@@ -15,7 +15,6 @@ const MyModal = (props) => {
 
   useEffect(() => {
     if (updateProduct) {
-      console.log(updateProduct);
       setProduct({
         ...product,
         name: updateProduct.name,

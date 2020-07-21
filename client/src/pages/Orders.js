@@ -28,7 +28,6 @@ const Orders = (props) => {
         },
       })
       .then((res) => {
-        console.log(res.data);
         setOrders(res.data.orders.reverse());
       })
       .catch((err) => {

@@ -33,7 +33,6 @@ const Home = (props) => {
         },
       })
       .then((res) => {
-        console.log(res.data);
         if (res.data && res.data.products) {
           setProducts(res.data.products);
         }
@@ -45,7 +44,6 @@ const Home = (props) => {
   };
 
   const submitHandler = (product) => {
-    console.log(product);
     if (updateProduct) {
       axios
         .patch(
@@ -61,7 +59,6 @@ const Home = (props) => {
           toast.success("Product updated successfully");
           setModal(false);
           setUpdateProduct(null);
-          console.log(res.data);
           if (res.data && res.data.product) {
             getProducts();
           }
@@ -80,7 +77,6 @@ const Home = (props) => {
         .then((res) => {
           toast.success("Product added successfully");
           setModal(false);
-          console.log(res.data);
           if (res.data && res.data.createdProduct) {
             getProducts();
           }
@@ -93,7 +89,6 @@ const Home = (props) => {
   };
 
   const update = (product) => {
-    console.log(product);
     setUpdateProduct(product);
     setModal(true);
   };
@@ -108,7 +103,6 @@ const Home = (props) => {
       .then((res) => {
         toast.success("Product deleted successfully");
         getProducts();
-        console.log(res.data);
       })
       .catch((err) => {
         console.log(err);
@@ -125,7 +119,6 @@ const Home = (props) => {
       })
       .then((res) => {
         toast.success("Product added to Cart.");
-        console.log(res.data);
       })
       .catch((err) => {
         console.log(err);
