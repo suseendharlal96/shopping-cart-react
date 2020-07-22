@@ -243,7 +243,7 @@ const Home = (props) => {
               <span style={{ float: "right" }}>
                 <label>Records per page</label>
                 <Dropdown
-                  placeholder="Records per page"
+                  placeholder="2"
                   search
                   options={limits}
                   onChange={setPageLimit}
