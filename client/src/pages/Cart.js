@@ -6,12 +6,12 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Card, Button, Image, Input, Transition } from "semantic-ui-react";
 
+import LoadingSkeleton from "../components/LoadingSkeleton";
 import { AuthContext } from "../context/authcontext";
 
 const Cart = (props) => {
   toast.configure();
   const [cartTotal, setTotal] = useState(0);
-  const [qtyChanged, setQtyChanged] = useState(false);
   const [myCart, setMyCart] = useState(null);
 
   const { token, userId, email } = useContext(AuthContext);
@@ -151,11 +151,6 @@ const Cart = (props) => {
                     </Button>
                     <Input readOnly type="text" value={c.qty} />
                     <Button onClick={() => increase(index)}>Increase</Button>
-                    {qtyChanged && (
-                      <Button inverted color="green" floated="right">
-                        Save Changes
-                      </Button>
-                    )}
                   </Card.Content>
                   <Card.Content extra>
                     <StripeCheckout
@@ -190,7 +185,7 @@ const Cart = (props) => {
           <h2>Cart is Empty</h2>
         )
       ) : (
-        <p>Loading...</p>
+        <LoadingSkeleton />
       )}
     </div>
   );

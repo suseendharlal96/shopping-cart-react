@@ -7,7 +7,6 @@ import Home from "./pages/Home";
 import Orders from "./pages/Orders";
 import Auth from "./pages/Auth";
 import Cart from "./pages/Cart";
-import Success from "./pages/Success";
 import Navbar from "./components/Navbar";
 import AuthProvider from "./context/authcontext";
 
@@ -22,7 +21,6 @@ const App=(props)=> {
               <Route path="/" exact component={Home} />
               <Route path="/orders" exact component={Orders} />
               <Route path="/cart" exact component={Cart} />
-              <Route path="/success" exact component={Success} />
               <Route path="/auth" exact component={Auth} />
             </Switch>
           </Container>

@@ -6,6 +6,7 @@ import dayjs from "dayjs";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+import LoadingSkeleton from "../components/LoadingSkeleton";
 import { AuthContext } from "../context/authcontext";
 
 const Orders = (props) => {
@@ -42,7 +43,7 @@ const Orders = (props) => {
     <div>
       <h2 style={{ textAlign: "center" }}>Your orders</h2>
       {orders ? (
-        orders.length>0 ? (
+        orders.length > 0 ? (
           <React.Fragment>
             <Transition.Group animation="horizondal flip" duration={800}>
               {orders.map((c, index) => (
@@ -89,7 +90,7 @@ const Orders = (props) => {
           <h2>Orders is Empty</h2>
         )
       ) : (
-        <p>Loading Orders...</p>
+        <LoadingSkeleton />
       )}
     </div>
   );

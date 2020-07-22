@@ -14,6 +14,7 @@ import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 
 import MyModal from "../components/MyModal";
+import LoadingSkeleton from "../components/LoadingSkeleton";
 import { AuthContext } from "../context/authcontext";
 
 const Home = (props) => {
@@ -159,8 +160,8 @@ const Home = (props) => {
   const productContent = products ? (
     products.length > 0 && paginationInfo && paginationInfo.totalPage ? (
       <React.Fragment>
-        <Transition.Group animation="vertical flip" duration={800}>
-          {products.map((product) => (
+        {products.map((product) => (
+          <Transition.Group animation="vertical flip" duration={800}>
             <Card fluid key={product._id}>
               <Card.Content>
                 <Image floated="right" size="tiny" src={product.image} />
@@ -198,14 +199,14 @@ const Home = (props) => {
                 )}
               </Card.Content>
             </Card>
-          ))}
-        </Transition.Group>
+          </Transition.Group>
+        ))}
       </React.Fragment>
     ) : (
       <p>No products</p>
     )
   ) : (
-    <p>Loading</p>
+    <LoadingSkeleton />
   );
 
   return (
