@@ -1,6 +1,14 @@
 import React, { useState, useEffect, useContext } from "react";
 
-import { Card, Button, Image, Grid } from "semantic-ui-react";
+import {
+  Card,
+  Button,
+  Image,
+  Grid,
+  Transition,
+  Pagination,
+  Dropdown,
+} from "semantic-ui-react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
@@ -14,6 +22,14 @@ const Home = (props) => {
     AuthContext
   );
   const [products, setProducts] = useState(null);
+  const [paginationInfo, setPaginationInfo] = useState([]);
+  const [activePage, setActivePage] = useState(1);
+  const [limits, setLimits] = useState([
+    { key: 1, text: "2", value: 2 },
+    { key: 2, text: "5", value: 5 },
+    { key: 3, text: "10", value: 10 },
+  ]);
+  const [currentLimit, setCurrentLimit] = useState(2);
   const [modal, setModal] = useState(false);
 
   useEffect(() => {
@@ -23,18 +39,22 @@ const Home = (props) => {
     return () => {
       source.cancel();
     };
-  }, []);
+  }, [activePage, currentLimit]);
 
   const getProducts = () => {
     axios
-      .get("https://node-shop-cart.herokuapp.com/products", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+      .get(
+        `http://localhost:5000/products?page=${activePage}&limit=${currentLimit}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
       .then((res) => {
         if (res.data && res.data.products) {
           setProducts(res.data.products);
+          setPaginationInfo(res.data.paginationInfo);
         }
       })
       .catch((err) => {
@@ -126,43 +146,61 @@ const Home = (props) => {
       });
   };
 
+  const paginate = (e, data) => {
+    console.log(data);
+    setActivePage(data.activePage);
+  };
+
+  const setPageLimit = (e, data) => {
+    console.log(data);
+    setCurrentLimit(data.value);
+  };
+
   const productContent = products ? (
-    products.length ? (
-      products.map((product) => (
-        <Card fluid key={product._id}>
-          <Card.Content>
-            <Image floated="right" size="tiny" src={product.image} />
-            <Card.Header>{product.name}</Card.Header>
-            <Card.Meta>{product.price}</Card.Meta>
-            <Card.Description>{product.description}</Card.Description>
-          </Card.Content>
-          <Card.Content extra>
-            <Button inverted onClick={() => addToCart(product)} color="green">
-              Add to Cart
-            </Button>
-            {userId && product.creator === userId && (
-              <React.Fragment>
+    products.length > 0 && paginationInfo && paginationInfo.totalPage ? (
+      <React.Fragment>
+        <Transition.Group animation="vertical flip" duration={800}>
+          {products.map((product) => (
+            <Card fluid key={product._id}>
+              <Card.Content>
+                <Image floated="right" size="tiny" src={product.image} />
+                <Card.Header>{product.name}</Card.Header>
+                <Card.Meta>{product.price}</Card.Meta>
+                <Card.Description>{product.description}</Card.Description>
+              </Card.Content>
+              <Card.Content extra>
                 <Button
-                  floated="right"
-                  onClick={() => deleteProduct(product._id)}
                   inverted
-                  color="red"
+                  onClick={() => addToCart(product)}
+                  color="green"
                 >
-                  Delete
+                  Add to Cart
                 </Button>
-                <Button
-                  floated="right"
-                  onClick={() => update(product)}
-                  inverted
-                  color="orange"
-                >
-                  Update
-                </Button>
-              </React.Fragment>
-            )}
-          </Card.Content>
-        </Card>
-      ))
+                {userId && product.creator === userId && (
+                  <React.Fragment>
+                    <Button
+                      floated="right"
+                      onClick={() => deleteProduct(product._id)}
+                      inverted
+                      color="red"
+                    >
+                      Delete
+                    </Button>
+                    <Button
+                      floated="right"
+                      onClick={() => update(product)}
+                      inverted
+                      color="orange"
+                    >
+                      Update
+                    </Button>
+                  </React.Fragment>
+                )}
+              </Card.Content>
+            </Card>
+          ))}
+        </Transition.Group>
+      </React.Fragment>
     ) : (
       <p>No products</p>
     )
@@ -171,7 +209,7 @@ const Home = (props) => {
   );
 
   return (
-    <Grid columns={3}>
+    <Grid columns={2}>
       <Grid.Row>
         {token ? (
           <Button primary onClick={() => setModal(true)}>
@@ -188,6 +226,33 @@ const Home = (props) => {
         submit={(product) => submitHandler(product)}
         close={() => setModal(false)}
       />
+      {products &&
+        products.length > 0 &&
+        paginationInfo &&
+        paginationInfo.totalPage && (
+          <Grid.Row>
+            <Grid.Column>
+              <Pagination
+                defaultActivePage={activePage}
+                onPageChange={paginate}
+                totalPages={paginationInfo && paginationInfo.totalPage}
+              />
+            </Grid.Column>
+            <Grid.Column>
+              <span style={{ float: "right" }}>
+                <label>Records per page</label>
+                <Dropdown
+                  placeholder="Records per page"
+                  search
+                  options={limits}
+                  onChange={setPageLimit}
+                  selection
+                  floating
+                />
+              </span>
+            </Grid.Column>
+          </Grid.Row>
+        )}
       <Grid.Row>{productContent}</Grid.Row>
     </Grid>
   );
