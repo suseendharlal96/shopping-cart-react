@@ -44,7 +44,7 @@ const Home = (props) => {
   const getProducts = () => {
     axios
       .get(
-        `http://localhost:5000/products?page=${activePage}&limit=${currentLimit}`,
+        `https://node-shop-cart.herokuapp.com/products?page=${activePage}&limit=${currentLimit}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

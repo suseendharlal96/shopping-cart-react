@@ -6,10 +6,6 @@ exports.getAllProducts = async (req, res, next) => {
   const limit = +req.query.limit;
   const startIndex = (page - 1) * limit;
   const endIndex = page * limit;
-  console.log(page);
-  console.log(limit);
-  console.log(startIndex);
-  console.log(endIndex);
 
   try {
     let products;
@@ -19,9 +15,6 @@ exports.getAllProducts = async (req, res, next) => {
     } else {
       products = await Product.find();
     }
-    // const products = await Product.find().limit(limit);
-    // console.log(products);
-
     const paginationInfo = {};
     paginationInfo.totalPage = Math.ceil(allProducts.length / limit);
     if (products) {
