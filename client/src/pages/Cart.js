@@ -1,50 +1,38 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
+import { connect } from "react-redux";
 
-import axios from "axios";
 import StripeCheckout from "react-stripe-checkout";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Card, Button, Image, Input, Transition } from "semantic-ui-react";
 
+import * as action from "../store/actions/index";
 import LoadingSkeleton from "../components/LoadingSkeleton";
-import { AuthContext } from "../context/authcontext";
+// import { AuthContext } from "../context/authcontext";
 
 const Cart = (props) => {
   toast.configure();
   const [cartTotal, setTotal] = useState(0);
-  const [myCart, setMyCart] = useState(null);
+  // const [myCart, setMyCart] = useState(null);
 
-  const { token, userId, email } = useContext(AuthContext);
+  // const { token, userId, email } = useContext(AuthContext);
 
   useEffect(() => {
-    if (!token) {
+    if (!props.token) {
       props.history.push("/auth");
     } else {
-      getCart();
+      props.getCart(props.token, props.userId);
+      if (props.errors) {
+        toast.error(props.errors);
+      }
     }
   }, []);
 
-  const getCart = () => {
-    axios
-      .get(`https://node-shop-cart.herokuapp.com/user/getCart/${userId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => {
-        if (res.data.cart) {
-          const a = [...res.data.cart];
-          setMyCart(res.data.cart);
-          calcTotalPrice(res.data.cart);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        toast.error(
-          "There was some trouble fetching your cart.Please try again!"
-        );
-      });
-  };
+  useEffect(() => {
+    if (props.cart) {
+      calcTotalPrice(props.cart);
+    }
+  }, [props.cart]);
 
   const calcTotalPrice = (cart) => {
     let total = 0;
@@ -59,7 +47,7 @@ const Cart = (props) => {
   };
 
   const increase = (i) => {
-    const a = [...myCart];
+    const a = [...props.cart];
     if (a && a.length) {
       a[i].qty += 1;
       calcTotalPrice(a);
@@ -67,68 +55,21 @@ const Cart = (props) => {
   };
 
   const decrease = (i) => {
-    const a = [...myCart];
+    const a = [...props.cart];
     if (a && a.length) {
       a[i].qty -= 1;
       calcTotalPrice(a);
     }
   };
 
-  const removeItem = (i, total, id) => {
-    const a = [...myCart];
-    a.splice(i, 1);
-    setMyCart(a);
-    const totalAmt = cartTotal - total;
-    setTotal(totalAmt);
-    axios
-      .post(
-        "https://node-shop-cart.herokuapp.com/user/removeCartItem",
-        { productId: id },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
-      .then((res) => {
-        toast.success("Product removed from cart.");
-      })
-      .catch((err) => {
-        console.log(err);
-        toast.error("There was some trouble.Please try again!");
-      });
-  };
-
-  const makepayment = (paymentToken, product, i) => {
-    axios
-      .post(
-        "https://node-shop-cart.herokuapp.com/user/pay",
-        { product: product, token: paymentToken },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
-      .then((res) => {
-        toast.success("Your payment was successfully received.");
-        getCart();
-        window.open(res.data.result.receipt_url, "_blank");
-      })
-      .catch((err) => {
-        toast.error("There was some trouble with payment.Please try again!");
-        console.log(err);
-      });
-  };
-
   return (
     <div>
       <h2 style={{ textAlign: "center" }}>Total Price:{cartTotal}</h2>
-      {myCart ? (
-        myCart.length > 0 ? (
+      {props.cart ? (
+        props.cart.length > 0 ? (
           <React.Fragment>
             <Transition.Group animation="drop" duration={800}>
-              {myCart.map((c, index) => (
+              {props.cart.map((c, index) => (
                 <Card fluid key={c._id}>
                   <Card.Content>
                     <Image floated="right" size="tiny" src={c.image} />
@@ -154,10 +95,10 @@ const Cart = (props) => {
                   </Card.Content>
                   <Card.Content extra>
                     <StripeCheckout
-                      token={(t) => makepayment(t, c, index)}
+                      token={(t) => props.makepayment(t, c, props.token)}
                       name={"Product Name: " + c.name}
                       image={c.image}
-                      email={email}
+                      email={props.email}
                       panelLabel={"Proceed to pay"}
                       description="STRIPE-Safe and Secure Payments"
                       stripeKey="pk_test_51H54IgEH45zGy2FRW5V9EQMtqCHFnUbuxogqUbG8ENCn5GBUT6qxDeFTvfomsusc2J6aUSpzmB3UJLnLOMh2aq4t00c2Cwlhz3"
@@ -171,7 +112,7 @@ const Cart = (props) => {
                     <Button
                       inverted
                       color="red"
-                      onClick={() => removeItem(index, c.qty * c.price, c._id)}
+                      onClick={() => props.removeItem(c._id, props.token)}
                       floated="right"
                     >
                       Remove from cart
@@ -191,4 +132,22 @@ const Cart = (props) => {
   );
 };
 
-export default Cart;
+const mapStateToProps = (state) => {
+  return {
+    token: state.authReducer.token,
+    userId: state.authReducer.userId,
+    email: state.authReducer.email,
+    cart: state.cartReducer.cart,
+    errors: state.cartReducer.errors,
+  };
+};
+const mapDispatchToProps = (dispatch) => {
+  return {
+    getCart: (token, userId) => dispatch(action.getCart(token, userId)),
+    removeItem: (id, token) => dispatch(action.removeFromCart(id, token)),
+    makepayment: (paymentToken, product, token) =>
+      dispatch(action.makePayment(paymentToken, product, token)),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Cart);

@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
+import { connect } from "react-redux";
 
 import {
   Card,
@@ -12,19 +13,16 @@ import {
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
+import * as actions from "../store/actions/index";
 
 import MyModal from "../components/MyModal";
 import LoadingSkeleton from "../components/LoadingSkeleton";
-import { AuthContext } from "../context/authcontext";
+// import { AuthContext } from "../context/authcontext";
 
 const Home = (props) => {
   toast.configure();
-  const { token, userId, setUpdateProduct, updateProduct } = useContext(
-    AuthContext
-  );
-  const [products, setProducts] = useState(null);
-  const [paginationInfo, setPaginationInfo] = useState([]);
   const [activePage, setActivePage] = useState(1);
+  const [updateProduct, setUpdateProduct] = useState(null);
   const [limits, setLimits] = useState([
     { key: 1, text: "2", value: 2 },
     { key: 2, text: "5", value: 5 },
@@ -36,115 +34,18 @@ const Home = (props) => {
   useEffect(() => {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
-    getProducts();
+    props.getProducts(activePage, currentLimit, props.token);
+    if (props.error) {
+      toast.error(props.error);
+    }
     return () => {
       source.cancel();
     };
   }, [activePage, currentLimit]);
 
-  const getProducts = () => {
-    axios
-      .get(
-        `https://node-shop-cart.herokuapp.com/products?page=${activePage}&limit=${currentLimit}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
-      .then((res) => {
-        if (res.data && res.data.products) {
-          setProducts(res.data.products);
-          setPaginationInfo(res.data.paginationInfo);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        toast.error("There was some trouble fetching.Please try again!");
-      });
-  };
-
-  const submitHandler = (product) => {
-    if (updateProduct) {
-      axios
-        .patch(
-          `https://node-shop-cart.herokuapp.com/products/${updateProduct._id}`,
-          product,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        )
-        .then((res) => {
-          toast.success("Product updated successfully");
-          setModal(false);
-          setUpdateProduct(null);
-          if (res.data && res.data.product) {
-            getProducts();
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-          toast.error("There was some trouble.Please try again!");
-        });
-    } else {
-      axios
-        .post("https://node-shop-cart.herokuapp.com/products", product, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        .then((res) => {
-          toast.success("Product added successfully");
-          setModal(false);
-          if (res.data && res.data.createdProduct) {
-            getProducts();
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-          toast.error("There was some trouble.Please try again!");
-        });
-    }
-  };
-
   const update = (product) => {
     setUpdateProduct(product);
     setModal(true);
-  };
-
-  const deleteProduct = (prodId) => {
-    axios
-      .delete(`https://node-shop-cart.herokuapp.com/products/${prodId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => {
-        toast.success("Product deleted successfully");
-        getProducts();
-      })
-      .catch((err) => {
-        console.log(err);
-        toast.error("There was some trouble.Please try again!");
-      });
-  };
-
-  const addToCart = (product) => {
-    axios
-      .post("https://node-shop-cart.herokuapp.com/user/cart", product, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => {
-        toast.success("Product added to Cart.");
-      })
-      .catch((err) => {
-        console.log(err);
-        toast.error("There was some trouble.Please try again!");
-      });
   };
 
   const paginate = (e, data) => {
@@ -157,12 +58,18 @@ const Home = (props) => {
     setCurrentLimit(data.value);
   };
 
-  const productContent = products ? (
-    products.length > 0 && paginationInfo && paginationInfo.totalPage ? (
+  const productContent = props.products ? (
+    props.products.length > 0 &&
+    props.paginationInfo &&
+    props.paginationInfo.totalPage ? (
       <React.Fragment>
-        {products.map((product) => (
-          <Transition.Group animation="vertical flip" duration={800}>
-            <Card fluid key={product._id}>
+        {props.products.map((product) => (
+          <Transition.Group
+            key={product._id}
+            animation="vertical flip"
+            duration={800}
+          >
+            <Card fluid>
               <Card.Content>
                 <Image floated="right" size="tiny" src={product.image} />
                 <Card.Header>{product.name}</Card.Header>
@@ -172,16 +79,23 @@ const Home = (props) => {
               <Card.Content extra>
                 <Button
                   inverted
-                  onClick={() => addToCart(product)}
+                  onClick={() => props.addToCart(product, props.token)}
                   color="green"
                 >
                   Add to Cart
                 </Button>
-                {userId && product.creator === userId && (
+                {props.userId && product.creator === props.userId && (
                   <React.Fragment>
                     <Button
                       floated="right"
-                      onClick={() => deleteProduct(product._id)}
+                      onClick={() =>
+                        props.deleteProduct(
+                          product._id,
+                          props.token,
+                          activePage,
+                          currentLimit
+                        )
+                      }
                       inverted
                       color="red"
                     >
@@ -212,7 +126,7 @@ const Home = (props) => {
   return (
     <Grid columns={2}>
       <Grid.Row>
-        {token ? (
+        {props.token ? (
           <Button primary onClick={() => setModal(true)}>
             Create Product
           </Button>
@@ -224,23 +138,33 @@ const Home = (props) => {
       </Grid.Row>
       <MyModal
         open={modal}
-        submit={(product) => submitHandler(product)}
         close={() => setModal(false)}
+        updateProduct={updateProduct}
+        activePage={activePage}
+        currentLimit={currentLimit}
       />
-      {products &&
-        products.length > 0 &&
-        paginationInfo &&
-        paginationInfo.totalPage && (
-          <Grid.Row>
+      {props.products &&
+        props.products.length > 0 &&
+        props.paginationInfo &&
+        props.paginationInfo.totalPage && (
+          <Grid.Row
+            style={{ display: "flex", justifyContent: "space-between" }}
+          >
             <Grid.Column>
               <Pagination
+                firstItem="first"
+                lastItem="last"
+                prevItem="previous"
+                nextItem="next"
                 defaultActivePage={activePage}
                 onPageChange={paginate}
-                totalPages={paginationInfo && paginationInfo.totalPage}
+                totalPages={
+                  props.paginationInfo && props.paginationInfo.totalPage
+                }
               />
             </Grid.Column>
             <Grid.Column>
-              <span style={{ float: "right" }}>
+              <span>
                 <label>Records per page</label>
                 <Dropdown
                   placeholder="2"
@@ -259,4 +183,23 @@ const Home = (props) => {
   );
 };
 
-export default Home;
+const mapStateToProps = (state) => {
+  return {
+    products: state.productReducer.products,
+    paginationInfo: state.productReducer.paginationInfo,
+    error: state.productReducer.error,
+    userId: state.authReducer.userId,
+    token: state.authReducer.token,
+  };
+};
+const mapDispatchToProps = (dispatch) => {
+  return {
+    getProducts: (activePage, currentLimit, authtoken) =>
+      dispatch(actions.getProducts(activePage, currentLimit, authtoken)),
+    deleteProduct: (id, token, activePage, currentLimit) =>
+      dispatch(actions.deleteProduct(id, token, activePage, currentLimit)),
+    addToCart: (product, token) => dispatch(actions.addToCart(product, token)),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Home);

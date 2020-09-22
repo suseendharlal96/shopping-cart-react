@@ -8,13 +8,13 @@ import Orders from "./pages/Orders";
 import Auth from "./pages/Auth";
 import Cart from "./pages/Cart";
 import Navbar from "./components/Navbar";
-import AuthProvider from "./context/authcontext";
+// import AuthProvider from "./context/authcontext";
 
-const App=(props)=> {
+const App=()=> {
   return (
     <BrowserRouter>
       <main>
-        <AuthProvider>
+        {/* <AuthProvider> */}
           <Navbar />
           <Container>
             <Switch>
@@ -24,7 +24,7 @@ const App=(props)=> {
               <Route path="/auth" exact component={Auth} />
             </Switch>
           </Container>
-        </AuthProvider>
+        {/* </AuthProvider> */}
       </main>
     </BrowserRouter>
   );

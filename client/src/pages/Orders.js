@@ -1,52 +1,56 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useEffect } from "react";
+import { connect } from "react-redux";
 
 import { Card, Image, Transition } from "semantic-ui-react";
-import axios from "axios";
 import dayjs from "dayjs";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+import * as action from "../store/actions/index";
 import LoadingSkeleton from "../components/LoadingSkeleton";
-import { AuthContext } from "../context/authcontext";
+// import { AuthContext } from "../context/authcontext";
 
 const Orders = (props) => {
   toast.configure();
-  const { token } = useContext(AuthContext);
-  const [orders, setOrders] = useState(null);
+  // const { token } = useContext(AuthContext);
+  // const [orders, setOrders] = useState(null);
   useEffect(() => {
-    if (!token) {
+    if (!props.token) {
       props.history.push("/");
     } else {
-      getOrders();
+      props.getOrders(props.token);
+      if (props.errors) {
+        toast.error(props.errors);
+      }
     }
   }, []);
 
-  const getOrders = () => {
-    axios
-      .get("https://node-shop-cart.herokuapp.com/user/orders", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => {
-        setOrders(res.data.orders.reverse());
-      })
-      .catch((err) => {
-        console.log(err);
-        toast.error(
-          "There was some trouble fetching your orders.Please try again!"
-        );
-      });
-  };
+  // const getOrders = () => {
+  //   axios
+  //     .get("https://node-shop-cart.herokuapp.com/user/orders", {
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     })
+  //     .then((res) => {
+  //       setOrders(res.data.orders.reverse());
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //       toast.error(
+  //        props.errors
+  //       );
+  //     });
+  // };
 
   return (
     <div>
       <h2 style={{ textAlign: "center" }}>Your orders</h2>
-      {orders ? (
-        orders.length > 0 ? (
+      {props.orders ? (
+        props.orders.length > 0 ? (
           <React.Fragment>
             <Transition.Group animation="horizondal flip" duration={800}>
-              {orders.map((c, index) => (
+              {props.orders.map((c, index) => (
                 <Card fluid key={c.date}>
                   <Card.Content>
                     <Image floated="right" size="tiny" src={c.product.image} />
@@ -96,4 +100,17 @@ const Orders = (props) => {
   );
 };
 
-export default Orders;
+const mapStateToProps = (state) => {
+  return {
+    orders: state.orderReducer.orders,
+    errors: state.orderReducer.errors,
+    token: state.authReducer.token,
+  };
+};
+const mapDispatchToProps = (dispatch) => {
+  return {
+    getOrders: (token) => dispatch(action.getOrders(token)),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Orders);

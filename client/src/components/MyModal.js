@@ -1,27 +1,31 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
+import { connect } from "react-redux";
 
 import { Modal, Button, Form } from "semantic-ui-react";
 
-import { AuthContext } from "../context/authcontext";
+import * as action from "../store/actions/index";
 
 const MyModal = (props) => {
-  const { updateProduct } = useContext(AuthContext);
   const [product, setProduct] = useState({
+    id: "",
     name: "",
     price: "",
     description: "",
-    imageurl: "",
+    image: "",
   });
 
+  const [updateId, setupdateId] = useState(null);
+
   useEffect(() => {
-    if (updateProduct) {
+    if (props && props.updateProduct) {
       setProduct({
         ...product,
-        name: updateProduct.name,
-        price: updateProduct.price,
-        imageurl: updateProduct.image,
-        description: updateProduct.description,
+        name: props.updateProduct.name,
+        price: props.updateProduct.price,
+        image: props.updateProduct.image,
+        description: props.updateProduct.description,
       });
+      setupdateId(props.updateProduct._id);
     }
   }, [props]);
 
@@ -34,21 +38,27 @@ const MyModal = (props) => {
       ...product,
       name: "",
       price: "",
-      imageurl: "",
+      image: "",
       description: "",
     });
     props.close();
   };
 
   const submit = () => {
-    props.submit(product);
+    props.submit(
+      product,
+      updateId,
+      props.token,
+      props.activePage,
+      props.currentLimit
+    );
+    props.close();
+    setupdateId(null);
   };
 
   return (
     <Modal size="small" open={props.open} onClose={reset}>
-      <Modal.Header>
-        {props.product ? "Update" : "Post"} a Product!
-      </Modal.Header>
+      <Modal.Header>{updateId ? "Update" : "Post"} a Product!</Modal.Header>
       <Modal.Content>
         <Form>
           <Form.Field>
@@ -68,10 +78,10 @@ const MyModal = (props) => {
               onChange={onChangeInput}
             />
             <Form.Input
-              name="imageurl"
+              name="image"
               //   error={errors && errors.price ? errors.price : null}
               type="text"
-              value={product.imageurl || ""}
+              value={product.image || ""}
               placeholder="Image link.."
               onChange={onChangeInput}
             />
@@ -105,4 +115,17 @@ const MyModal = (props) => {
   );
 };
 
-export default MyModal;
+const mapStateToProps = (state) => {
+  return { token: state.authReducer.token };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    submit: (product, updateId, token, activePage, currentLimit) =>
+      dispatch(
+        action.updateProduct(product, updateId, token, activePage, currentLimit)
+      ),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(MyModal);

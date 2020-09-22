@@ -1,22 +1,21 @@
-import React, { useContext } from "react";
+import React from "react";
 import { NavLink } from "react-router-dom";
+import { connect } from "react-redux";
 
+import * as action from "../store/actions/index";
 import { Menu } from "semantic-ui-react";
 
-import { AuthContext } from "../context/authcontext";
-
-const Navbar = () => {
-  const { email, setToken, token } = useContext(AuthContext);
-  return token ? (
+const Navbar = (props) => {
+  return props.token ? (
     <Menu inverted>
       <Menu.Item name="Home" as={NavLink} exact to="/" />
       <Menu.Item name="cart" as={NavLink} to="/cart" />
       <Menu.Item name="Orders" as={NavLink} to="/orders" />
       <Menu.Menu position="right">
-        <Menu.Item name={"Logged as " + email.split("@")[0]} />
+        <Menu.Item name={"Logged as " + props.email.split("@")[0]} />
         <Menu.Item
           name="logout"
-          onClick={() => setToken(null)}
+          onClick={() => props.logout()}
           as={NavLink}
           to="/auth"
         />
@@ -32,4 +31,17 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+const mapStateToProps = (state) => {
+  return {
+    token: state.authReducer.token,
+    email: state.authReducer.email,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    logout: () => dispatch(action.logout()),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Navbar);
