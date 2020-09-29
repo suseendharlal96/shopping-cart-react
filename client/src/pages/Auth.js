@@ -30,7 +30,7 @@ const Auth = (props) => {
 
   const onSubmit = (e) => {
     e.preventDefault();
-    // setemaile('')
+    // setemail('')
     setErrors({ ...errors, email: null, password: null, general: null });
     console.log(errors.email);
     // setLoading(true);
@@ -50,6 +50,7 @@ const Auth = (props) => {
           loading={props.loading}
           label="Email"
           autoFocus
+          required
           placeholder="Email.."
           name="email"
           value={formValue.email}
@@ -65,6 +66,7 @@ const Auth = (props) => {
           icon="user"
           placeholder="Password.."
           name="password"
+          required
           loading={props.loading}
           value={formValue.password}
           onChange={onChangeInput}

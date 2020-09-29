@@ -124,7 +124,7 @@ const Home = (props) => {
   );
 
   return (
-    <Grid columns={2}>
+    <div>
       <Grid.Row>
         {props.token ? (
           <Button primary onClick={() => setModal(true)}>
@@ -147,8 +147,12 @@ const Home = (props) => {
         props.products.length > 0 &&
         props.paginationInfo &&
         props.paginationInfo.totalPage && (
-          <Grid.Row
-            style={{ display: "flex", justifyContent: "space-between" }}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              flexWrap: "wrap",
+            }}
           >
             <Grid.Column>
               <Pagination
@@ -176,10 +180,10 @@ const Home = (props) => {
                 />
               </span>
             </Grid.Column>
-          </Grid.Row>
+          </div>
         )}
       <Grid.Row>{productContent}</Grid.Row>
-    </Grid>
+    </div>
   );
 };
 
