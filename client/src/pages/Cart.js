@@ -38,7 +38,7 @@ const Cart = (props) => {
     let total = 0;
     if (cart && cart.length) {
       cart.map((c) => {
-        total += c.price * c.qty;
+        total += c.price * c.quantity;
       });
       setTotal(total);
     } else {
@@ -49,7 +49,7 @@ const Cart = (props) => {
   const increase = (i) => {
     const a = [...props.cart];
     if (a && a.length) {
-      a[i].qty += 1;
+      a[i].quantity += 1;
       calcTotalPrice(a);
     }
   };
@@ -57,7 +57,7 @@ const Cart = (props) => {
   const decrease = (i) => {
     const a = [...props.cart];
     if (a && a.length) {
-      a[i].qty -= 1;
+      a[i].quantity -= 1;
       calcTotalPrice(a);
     }
   };
@@ -78,19 +78,19 @@ const Cart = (props) => {
                       <strong>Price:{c.price}</strong>
                     </Card.Meta>
                     <Card.Meta>
-                      <strong>Quantity:{c.qty}</strong>
+                      <strong>Quantity:{c.quantity}</strong>
                     </Card.Meta>
                     <Card.Meta>
-                      <strong>Total price:{c.qty * c.price}</strong>
+                      <strong>Total price:{c.quantity * c.price}</strong>
                     </Card.Meta>
                     <Card.Description>About:{c.description}</Card.Description>
                     <Button
-                      disabled={c.qty === 1}
+                      disabled={c.quantity === 1}
                       onClick={() => decrease(index)}
                     >
                       Decrease
                     </Button>
-                    <Input readOnly type="text" value={c.qty} />
+                    <Input readOnly type="text" value={c.quantity} />
                     <Button onClick={() => increase(index)}>Increase</Button>
                   </Card.Content>
                   <Card.Content extra>
@@ -102,7 +102,7 @@ const Cart = (props) => {
                       panelLabel={"Proceed to pay"}
                       description="STRIPE-Safe and Secure Payments"
                       stripeKey="pk_test_51H54IgEH45zGy2FRW5V9EQMtqCHFnUbuxogqUbG8ENCn5GBUT6qxDeFTvfomsusc2J6aUSpzmB3UJLnLOMh2aq4t00c2Cwlhz3"
-                      amount={c.qty * c.price * 100}
+                      amount={c.quantity * c.price * 100}
                       currency="INR"
                     >
                       <Button inverted color="green">
