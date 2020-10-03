@@ -66,25 +66,33 @@ const Orders = (props) => {
                         Total price:{c.product.qty * c.product.price}
                       </strong>
                     </Card.Meta>
-                    <Card.Meta>
-                      <strong>Payment Type:{c.paymentDetails.type}</strong>
-                    </Card.Meta>
-                    <Card.Meta>
-                      <strong>Card Type:{c.paymentDetails.card.brand}</strong>
-                    </Card.Meta>
+                    {c && c.paymentDetails && (
+                      <>
+                        <Card.Meta>
+                          <strong>Payment Type:{c.paymentDetails.type}</strong>
+                        </Card.Meta>
+                        <Card.Meta>
+                          <strong>
+                            Card Type:{c.paymentDetails.card.brand}
+                          </strong>
+                        </Card.Meta>
+                      </>
+                    )}
                     <Card.Meta>
                       <strong>
                         Paid on:
                         {dayjs(c.date).format("ddd, MMM D, YYYY h:mm A")}
                       </strong>
                     </Card.Meta>
-                    <a
-                      style={{ float: "right" }}
-                      href={c.receiptUrl}
-                      target="_blank"
-                    >
-                      Click to view your Payment receipt
-                    </a>
+                    {c && c.receiptUrl && (
+                      <a
+                        style={{ float: "right" }}
+                        href={c.receiptUrl}
+                        target="_blank"
+                      >
+                        Click to view your Payment receipt
+                      </a>
+                    )}
                   </Card.Content>
                 </Card>
               ))}
