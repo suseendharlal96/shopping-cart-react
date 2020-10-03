@@ -59,11 +59,11 @@ const Orders = (props) => {
                       <strong>Price:{c.product.price}</strong>
                     </Card.Meta>
                     <Card.Meta>
-                      <strong>Quantity:{c.product.qty}</strong>
+                      <strong>Quantity:{c.product.quantity}</strong>
                     </Card.Meta>
                     <Card.Meta>
                       <strong>
-                        Total price:{c.product.qty * c.product.price}
+                        Total price:{c.product.quantity * c.product.price}
                       </strong>
                     </Card.Meta>
                     {c && c.paymentDetails && (
